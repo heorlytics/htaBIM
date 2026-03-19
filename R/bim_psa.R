@@ -237,6 +237,7 @@ bim_run_psa <- function(
   v[1L]
 }
 
+#' @rdname bim_run_psa
 #' @export
 print.bim_psa <- function(x, ...) {
   cat("htaBIM Probabilistic Sensitivity Analysis\n")

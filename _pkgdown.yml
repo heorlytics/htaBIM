@@ -108,7 +108,6 @@ reference:
       - print.bim_payer
       - print.bim_model
       - print.bim_dsa
-      - print.bim_psa
       - summary.bim_population
       - summary.bim_model
 
