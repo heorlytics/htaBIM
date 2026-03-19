@@ -60,17 +60,16 @@ tooltip_ <- function(label, tip) {
 ui <- page_navbar(
   title = "htaBIM",
   theme = bs_theme(
-    version      = 5,
-    bootswatch   = "flatly",
-    primary      = "#2166AC",
-    heading_font = "Inter, system-ui, sans-serif",
-    base_font    = "Inter, system-ui, sans-serif"
-  ),
-  header = tags$head(
-    tags$link(
-      rel  = "stylesheet",
-      href = "https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap"
-    )
+    version = 5,
+    primary = "#2166AC",
+    success = "#18bc9c",
+    info    = "#3498db",
+    warning = "#f39c12",
+    danger  = "#e74c3c",
+    "body-color"      = "#2c3e50",
+    "body-bg"         = "#ffffff",
+    "navbar-bg"       = "#1a3a5c",
+    "font-family-base" = "system-ui, -apple-system, 'Segoe UI', sans-serif"
   ),
   bg       = "#1a3a5c",
   inverse  = TRUE,
