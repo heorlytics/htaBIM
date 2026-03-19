@@ -28,7 +28,7 @@ plotting function based on the \code{type} argument.
 }
 \examples{
 pop <- bim_population(
-  indication    = "IgA Nephropathy",
+  indication    = "Disease X",
   country       = "GB",
   years         = 1:5,
   prevalence    = 0.003,

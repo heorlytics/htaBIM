@@ -56,7 +56,7 @@ for treatment \eqn{i}.
 }
 \examples{
 pop <- bim_population(
-  indication    = "IgA Nephropathy",
+  indication    = "Disease X",
   country       = "GB",
   years         = 1:3,
   prevalence    = 0.003,

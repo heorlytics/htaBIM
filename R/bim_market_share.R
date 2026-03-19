@@ -44,7 +44,7 @@
 #'
 #' @examples
 #' pop <- bim_population(
-#'   indication  = "IgA Nephropathy",
+#'   indication  = "Disease X",
 #'   country     = "GB",
 #'   years       = 1:5,
 #'   prevalence  = 0.003,

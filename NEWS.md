@@ -27,7 +27,7 @@
 
 ### Data
 
-* `bim_example` — illustrative IgA Nephropathy BIM inputs for vignettes
+* `bim_example` — illustrative Disease X BIM inputs for vignettes
   and testing.
 
 ### Documentation
