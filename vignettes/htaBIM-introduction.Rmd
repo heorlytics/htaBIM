@@ -1,0 +1,226 @@
+---
+title: "Introduction to htaBIM"
+author: "Shubhram Pandey: Heorlytics Ltd"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Introduction to htaBIM}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment  = "#>",
+  fig.width  = 7,
+  fig.height = 4.5
+)
+library(htaBIM)
+```
+
+## Overview
+
+`htaBIM` provides a structured, reproducible framework for **budget impact
+modelling (BIM)** in health technology assessment (HTA), following the ISPOR
+Task Force guidelines (Sullivan et al., 2014; Mauskopf et al., 2007).
+
+A budget impact model answers: *"If this new treatment is reimbursed, what is
+the financial impact on the payer's budget over the next 1–5 years?"*
+
+## Workflow
+
+```
+bim_population() -> bim_market_share() -> bim_costs() -> bim_model() -> outputs
+```
+
+## Step 1: Eligible population
+
+The epidemiology funnel estimates the number of patients eligible for treatment
+each year from a reference population size and cascade rates.
+
+```{r population}
+pop <- bim_population(
+  indication     = "Disease X",
+  country        = "custom",
+  years          = 1:5,
+  prevalence     = 0.003,
+  n_total_pop    = 42e6,
+  diagnosed_rate = 0.60,
+  treated_rate   = 0.45,
+  eligible_rate  = 0.30,
+  growth_rate    = 0.005,
+  data_source    = "Illustrative values only"
+)
+summary(pop)
+```
+
+## Step 2: Market shares
+
+Define the mix of treatments in the current world (without new drug) and the
+new world (with new drug), plus any scenario variants.
+
+```{r market-share}
+ms <- bim_market_share(
+  population     = pop,
+  treatments     = c("Drug C (SoC)", "Drug B", "Drug A (new)"),
+  new_drug       = "Drug A (new)",
+  shares_current = c("Drug C (SoC)" = 0.75, "Drug B" = 0.25, "Drug A (new)" = 0.00),
+  shares_new     = c("Drug C (SoC)" = 0.60, "Drug B" = 0.20, "Drug A (new)" = 0.20),
+  dynamics       = "linear",
+  uptake_params  = list(ramp_years = 3),
+  scenarios = list(
+    conservative = c("Drug C (SoC)" = 0.68, "Drug B" = 0.22, "Drug A (new)" = 0.10),
+    optimistic   = c("Drug C (SoC)" = 0.50, "Drug B" = 0.18, "Drug A (new)" = 0.32)
+  )
+)
+print(ms)
+```
+
+## Step 3: Costs
+
+Per-patient annual costs are built by treatment and cost category (drug, admin,
+monitoring, adverse events, other). Adverse event costs can be computed from
+an event-rate table.
+
+```{r costs}
+ae_tab <- data.frame(
+  ae_name   = c("Injection site reaction", "Fatigue"),
+  rate      = c(0.07, 0.12),
+  unit_cost = c(180, 95)
+)
+ae_new <- bim_costs_ae("Drug A (new)", ae_tab)
+
+costs <- bim_costs(
+  treatments       = c("Drug C (SoC)", "Drug B", "Drug A (new)"),
+  currency         = "GBP",
+  price_year       = 2025L,
+  drug_costs       = c("Drug C (SoC)" = 220,   "Drug B" = 22400, "Drug A (new)" = 28800),
+  admin_costs      = c("Drug C (SoC)" = 0,     "Drug B" = 0,     "Drug A (new)" = 480),
+  monitoring_costs = c("Drug C (SoC)" = 650,   "Drug B" = 1550,  "Drug A (new)" = 1950),
+  ae_costs         = c("Drug C (SoC)" = 80,    "Drug B" = 210,   "Drug A (new)" = as.numeric(ae_new))
+)
+print(costs)
+```
+
+## Step 4: Assemble model
+
+```{r model}
+model <- bim_model(
+  population    = pop,
+  market_share  = ms,
+  costs         = costs,
+  payer         = bim_payer_nhs(),
+  discount_rate = 0,
+  label         = "Disease X -- Drug A BIM, NHS England"
+)
+summary(model)
+```
+
+## Step 5: Plots
+
+```{r plot-line, fig.cap = "Annual budget impact by scenario"}
+bim_plot_line(model, scenario = c("base", "conservative", "optimistic"))
+```
+
+```{r plot-shares, fig.cap = "Market share evolution"}
+bim_plot_shares(model)
+```
+
+## Sensitivity analysis
+
+### Deterministic (one-way) sensitivity analysis
+
+```{r sensitivity}
+sens <- bim_sensitivity_spec(
+  prevalence_range           = c(0.0015, 0.005),
+  eligible_rate_range        = c(0.20, 0.45),
+  drug_cost_multiplier_range = c(0.85, 1.15)
+)
+dsa <- bim_run_dsa(model, sens, year = 5L)
+```
+
+```{r tornado, fig.cap = "DSA tornado diagram (Year 5)"}
+bim_plot_tornado(dsa, currency = "GBP")
+```
+
+### Probabilistic sensitivity analysis (PSA)
+
+PSA samples all uncertain parameters simultaneously from statistical
+distributions (Beta for rates, LogNormal for costs) to produce a distribution
+of budget impact outcomes.
+
+```{r psa}
+set.seed(42)
+psa <- bim_run_psa(
+  model,
+  n_sim            = 500L,
+  prevalence_se    = 0.0005,
+  eligible_rate_se = 0.05,
+  cost_cv          = 0.10,
+  year             = 5L
+)
+print(psa)
+```
+
+```{r psa-plot, fig.cap = "PSA distribution of Year 5 budget impact"}
+bim_plot_psa(psa)
+```
+
+## Scenario comparison table
+
+`bim_scenario_table()` produces a side-by-side summary across all scenarios,
+useful for dossier submissions.
+
+```{r scenario-table}
+st <- bim_scenario_table(model)
+knitr::kable(st, caption = "Scenario comparison — budget impact summary")
+```
+
+## Cost breakdown
+
+`bim_cost_breakdown()` decomposes the per-patient annual cost by component
+for each treatment, aiding transparency.
+
+```{r cost-breakdown}
+cb <- bim_cost_breakdown(model)
+knitr::kable(cb, caption = "Per-patient annual cost by component and treatment")
+```
+
+## Results table
+
+```{r table}
+tab <- bim_table(model, format = "annual", scenario = "base")
+knitr::kable(tab, caption = "Annual budget impact -- base case")
+```
+
+## Built-in example data
+
+```{r example}
+data("bim_example")
+pop2   <- do.call(bim_population,   bim_example$population_params)
+ms2    <- do.call(bim_market_share,
+                  c(list(population = pop2), bim_example$market_share_params))
+costs2 <- do.call(bim_costs, bim_example$cost_params)
+model2 <- bim_model(pop2, ms2, costs2)
+summary(model2)
+```
+
+## Interactive app
+
+An interactive Shiny dashboard is bundled with the package:
+
+```r
+htaBIM::launch_shiny()
+```
+
+A live demo is available at the link in the
+[htaBIM pkgdown site](https://heorlytics.github.io/htaBIM/articles/shiny-app.html).
+
+## References
+
+Sullivan SD et al. (2014). Value in Health 17(1):5–14.
+doi:10.1016/j.jval.2013.08.2291
+
+Mauskopf JA et al. (2007). Value in Health 10(5):336–347.
+doi:10.1111/j.1524-4733.2007.00187.x

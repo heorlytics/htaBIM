@@ -1,0 +1,29 @@
+# R build artifacts
+*.Rhistory
+*.RData
+*.Rproj.user/
+.Rproj.user
+*.Ruserdata
+
+# Installed packages
+/packrat/
+/renv/
+
+# Build outputs
+*.tar.gz
+*.zip
+/check/
+
+# pkgdown site
+/docs/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# IDE
+.idea/
+*.sublime-project
+*.sublime-workspace
