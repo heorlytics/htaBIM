@@ -2,6 +2,7 @@
 % Please edit documentation in R/bim_psa.R
 \name{bim_run_psa}
 \alias{bim_run_psa}
+\alias{print.bim_psa}
 \title{Run a probabilistic sensitivity analysis (PSA)}
 \usage{
 bim_run_psa(
@@ -16,6 +17,8 @@ bim_run_psa(
   scenario = "base",
   seed = NULL
 )
+
+\method{print}{bim_psa}(x, ...)
 }
 \arguments{
 \item{model}{A \code{bim_model} object (base case).}
@@ -63,9 +66,9 @@ that reflects joint parameter uncertainty.
 
 \strong{Distributional assumptions}
 \itemize{
-\item Prevalence, diagnosed rate, treated rate, eligible rate — \strong{Beta}
+\item Prevalence, diagnosed rate, treated rate, eligible rate -- \strong{Beta}
 distribution parameterised from the base-case value and a standard error.
-\item Drug cost — \strong{LogNormal} distribution parameterised from the
+\item Drug cost -- \strong{LogNormal} distribution parameterised from the
 base-case value and a coefficient of variation (CV).
 }
 }
