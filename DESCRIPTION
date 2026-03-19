@@ -16,10 +16,13 @@ Description: Implements a structured, reproducible framework for budget impact
     Provides functions for epidemiology-driven population estimation, market
     share modelling with flexible uptake dynamics, per-patient cost calculation
     across multiple cost categories, multi-year budget projections, payer
-    perspective analysis, and deterministic scenario and sensitivity analysis.
+    perspective analysis, deterministic sensitivity analysis (DSA), and
+    probabilistic sensitivity analysis (PSA) via Monte Carlo simulation.
     Produces submission-quality outputs including ISPOR-aligned summary tables,
-    tornado diagrams, and text and HTML reports
-    compatible with NICE, CADTH, and EU-HTA dossier formats.
+    scenario comparison tables, per-patient cost breakdowns, tornado diagrams,
+    PSA histograms, and text and HTML reports compatible with NICE, CADTH, and
+    EU-HTA dossier formats. Ships with an interactive Shiny dashboard built on
+    'bslib' for point-and-click model building and exploration.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -45,9 +48,9 @@ Suggests:
     flextable (>= 0.9.0),
     officer (>= 0.6.0),
     shiny (>= 1.8.0),
-    shinydashboard,
-    shinyWidgets,
-    DT,
+    bslib (>= 0.7.0),
+    bsicons (>= 0.1.2),
+    DT (>= 0.31),
     knitr,
     rmarkdown,
     testthat (>= 3.0.0),

@@ -273,6 +273,52 @@ test_that("bim_plot_tornado runs without error", {
   })
 })
 
+# ── PSA tests ─────────────────────────────────────────────────────────────────
+
+test_that("bim_run_psa returns bim_psa with correct structure", {
+  model <- .make_minimal_model()
+  set.seed(42)
+  psa <- bim_run_psa(model, n_sim = 50L,
+                     prevalence_se = 0.001, cost_cv = 0.10)
+  expect_s3_class(psa, "bim_psa")
+  expect_true(is.data.frame(psa$simulations))
+  expect_true("budget_impact" %in% names(psa$simulations))
+  expect_true(psa$n_converged > 0L)
+})
+
+test_that("bim_run_psa summary has correct columns", {
+  model <- .make_minimal_model()
+  set.seed(1)
+  psa <- bim_run_psa(model, n_sim = 30L, cost_cv = 0.10)
+  expect_true(all(c("mean", "sd", "median", "ci_lower", "ci_upper") %in%
+                    names(psa$summary)))
+})
+
+test_that("print.bim_psa does not error", {
+  model <- .make_minimal_model()
+  set.seed(7)
+  psa <- bim_run_psa(model, n_sim = 30L, cost_cv = 0.05)
+  expect_output(print(psa), "Probabilistic Sensitivity Analysis")
+})
+
+# ── Scenario table tests ───────────────────────────────────────────────────────
+
+test_that("bim_scenario_table returns data.frame with Scenario column", {
+  model <- .make_minimal_model()
+  st <- bim_scenario_table(model)
+  expect_true(is.data.frame(st))
+  expect_true("Scenario" %in% names(st))
+})
+
+# ── Cost breakdown tests ───────────────────────────────────────────────────────
+
+test_that("bim_cost_breakdown returns data.frame with Cost component column", {
+  model <- .make_minimal_model()
+  cb <- bim_cost_breakdown(model)
+  expect_true(is.data.frame(cb))
+  expect_true("Cost component" %in% names(cb))
+})
+
 # ── Example dataset ───────────────────────────────────────────────────────────
 
 test_that("bim_example dataset loads and rebuilds model", {

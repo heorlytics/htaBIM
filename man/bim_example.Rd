@@ -3,7 +3,7 @@
 \docType{data}
 \name{bim_example}
 \alias{bim_example}
-\title{Example budget impact model inputs: IgA Nephropathy}
+\title{Example budget impact model inputs: Disease X}
 \format{
 A named \code{list} with three elements:
 \describe{
@@ -21,9 +21,9 @@ bim_example
 }
 \description{
 A named list containing example inputs for a hypothetical budget impact
-model for a new treatment in IgA Nephropathy (IgAN), for use in
-vignettes, examples, and testing. All values are illustrative only and
-do not represent any real drug, price, or epidemiological estimate.
+model for a new treatment (Drug A) in a chronic condition (Disease X),
+for use in vignettes, examples, and testing. All values are illustrative
+only and do not represent any real drug, price, or epidemiological estimate.
 }
 \examples{
 data(bim_example)

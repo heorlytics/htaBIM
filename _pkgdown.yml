@@ -23,6 +23,13 @@ navbar:
     left:  [reference, articles, news]
     right: [search, github]
   components:
+    articles:
+      text: Articles
+      menu:
+        - text: Introduction
+          href: articles/htaBIM-introduction.html
+        - text: Interactive Shiny App
+          href: articles/shiny-app.html
     github:
       icon: fa-github
       href: https://github.com/Heorlytics/htaBIM
@@ -60,22 +67,35 @@ reference:
       - bim_payer_us_commercial
 
   - title: "Sensitivity analysis"
-    desc: Deterministic sensitivity analysis tools.
+    desc: Deterministic and probabilistic sensitivity analysis tools.
     contents:
       - bim_sensitivity_spec
       - bim_run_dsa
+      - bim_run_psa
 
   - title: "Results and outputs"
     desc: Extract results, tables, plots, and reports.
     contents:
       - bim_extract
       - bim_table
+      - bim_scenario_table
+      - bim_cost_breakdown
       - bim_report
+
+  - title: "Plots"
+    desc: Visualisation functions.
+    contents:
       - plot.bim_model
       - bim_plot_line
       - bim_plot_bar
       - bim_plot_shares
       - bim_plot_tornado
+      - bim_plot_psa
+      - bim_plot_cost_breakdown
+
+  - title: "Interactive app"
+    desc: Shiny dashboard.
+    contents:
       - launch_shiny
 
   - title: "Data"
@@ -88,3 +108,7 @@ articles:
     navbar: ~
     contents:
       - htaBIM-introduction
+  - title: "Interactive app"
+    navbar: ~
+    contents:
+      - shiny-app
