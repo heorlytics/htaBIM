@@ -154,7 +154,7 @@ of budget impact outcomes.
 set.seed(42)
 psa <- bim_run_psa(
   model,
-  n_sim            = 500L,
+  n_sim            = 200L,
   prevalence_se    = 0.0005,
   eligible_rate_se = 0.05,
   cost_cv          = 0.10,

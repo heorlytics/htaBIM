@@ -1,8 +1,6 @@
 on:
   push:
     branches: [main, master]
-  pull_request:
-    branches: [main, master]
   release:
     types: [published]
   workflow_dispatch:
@@ -11,13 +9,13 @@ name: pkgdown
 
 permissions:
   contents: write
-  pages:    write
 
 jobs:
   pkgdown:
     runs-on: ubuntu-latest
     concurrency:
       group: pkgdown-${{ github.event_name }}
+      cancel-in-progress: true
 
     env:
       GITHUB_PAT: ${{ secrets.GITHUB_TOKEN }}
@@ -41,7 +39,6 @@ jobs:
         shell: Rscript {0}
 
       - name: Deploy to GitHub pages
-        if: github.event_name != 'pull_request'
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           clean: false

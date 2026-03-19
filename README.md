@@ -2,9 +2,19 @@
 
 <!-- badges: start -->
 [![CRAN status](https://www.r-pkg.org/badges/version/htaBIM)](https://CRAN.R-project.org/package=htaBIM)
+[![CRAN downloads](https://cranlogs.r-pkg.org/badges/metaSurvival)](https://CRAN.R-project.org/package=metaSurvival)
 [![R-CMD-check](https://github.com/Heorlytics/htaBIM/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/Heorlytics/htaBIM/actions/workflows/R-CMD-check.yaml)
 [![Lifecycle: stable](https://img.shields.io/badge/lifecycle-stable-brightgreen.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+<!-- badges: end -->
+
+### Download stats for CRAN
+
+<!-- badges: start -->
+
+[![](http://cranlogs.r-pkg.org/badges/grand-total/htaBIM?color=orange)](https://cran.r-project.org/package=htaBIM)
+[![](http://cranlogs.r-pkg.org/badges/last-month/htaBIM?color=orange)](https://cran.r-project.org/package=htaBIM)
+[![](http://cranlogs.r-pkg.org/badges/last-week/htaBIM?color=orange)](https://cran.r-project.org/package=htaBIM)
 <!-- badges: end -->
 
 ## Overview

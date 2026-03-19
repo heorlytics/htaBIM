@@ -11,9 +11,9 @@
 #'
 #' **Distributional assumptions**
 #' \itemize{
-#'   \item Prevalence, diagnosed rate, treated rate, eligible rate — **Beta**
+#'   \item Prevalence, diagnosed rate, treated rate, eligible rate -- **Beta**
 #'     distribution parameterised from the base-case value and a standard error.
-#'   \item Drug cost — **LogNormal** distribution parameterised from the
+#'   \item Drug cost -- **LogNormal** distribution parameterised from the
 #'     base-case value and a coefficient of variation (CV).
 #' }
 #'
@@ -290,7 +290,7 @@ bim_plot_psa <- function(
     sprintf("Budget impact (%s)", psa$currency)
 
   plot_title <- title %||%
-    sprintf("PSA distribution — Year %d budget impact (%d simulations)",
+    sprintf("PSA distribution -- Year %d budget impact (%d simulations)",
             psa$year, psa$n_converged)
 
   bi   <- psa$simulations$budget_impact / divisor

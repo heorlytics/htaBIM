@@ -1,5 +1,5 @@
 ## inst/shiny/htaBIM_app/app.R
-## htaBIM interactive dashboard — launch with htaBIM::launch_shiny()
+## htaBIM interactive dashboard -- launch with htaBIM::launch_shiny()
 
 for (pkg in c("shiny", "bslib", "bsicons", "DT", "htaBIM")) {
   if (!requireNamespace(pkg, quietly = TRUE))
@@ -13,7 +13,7 @@ library(bsicons)
 library(DT)
 library(htaBIM)
 
-# ── Helpers ──────────────────────────────────────────────────────────────────
+# -- Helpers ------------------------------------------------------------------
 
 # Wraps a label string in a <span title="..."> for hover tooltips in the UI
 tooltip_ <- function(label, tip) {
@@ -21,7 +21,7 @@ tooltip_ <- function(label, tip) {
 }
 
 .fmt_bi <- function(x, currency) {
-  if (is.null(x) || is.na(x)) return("—")
+  if (is.null(x) || is.na(x)) return("--")
   abs_m  <- abs(x) / 1e6
   sign_s <- if (x < 0) "-" else "+"
   sprintf("%s%s %.2fM", sign_s, currency, abs_m)
@@ -43,7 +43,7 @@ tooltip_ <- function(label, tip) {
   )
 }
 
-# ── UI ────────────────────────────────────────────────────────────────────────
+# -- UI ------------------------------------------------------------------------
 
 ui <- page_navbar(
   title = tags$span(
@@ -61,7 +61,7 @@ ui <- page_navbar(
   inverse  = TRUE,
   fillable = FALSE,
 
-  # ── Tab 1: Inputs ──────────────────────────────────────────────────────────
+  # -- Tab 1: Inputs ----------------------------------------------------------
   nav_panel(
     "Model Setup",
     icon = bsicons::bs_icon("sliders"),
@@ -215,7 +215,7 @@ ui <- page_navbar(
     )
   ),
 
-  # ── Tab 2: Results ─────────────────────────────────────────────────────────
+  # -- Tab 2: Results ---------------------------------------------------------
   nav_panel(
     "Results",
     icon = bsicons::bs_icon("bar-chart-line"),
@@ -223,7 +223,7 @@ ui <- page_navbar(
     uiOutput("results_ui")
   ),
 
-  # ── Tab 3: Market Shares ───────────────────────────────────────────────────
+  # -- Tab 3: Market Shares ---------------------------------------------------
   nav_panel(
     "Market Shares",
     icon = bsicons::bs_icon("pie-chart"),
@@ -236,7 +236,7 @@ ui <- page_navbar(
     )
   ),
 
-  # ── Tab 4: Sensitivity ─────────────────────────────────────────────────────
+  # -- Tab 4: Sensitivity -----------------------------------------------------
   nav_panel(
     "Sensitivity",
     icon = bsicons::bs_icon("tornado"),
@@ -299,7 +299,7 @@ ui <- page_navbar(
     )
   ),
 
-  # ── Tab 5: Scenario comparison ─────────────────────────────────────────────
+  # -- Tab 5: Scenario comparison ---------------------------------------------
   nav_panel(
     "Scenarios",
     icon = bsicons::bs_icon("table"),
@@ -322,7 +322,7 @@ ui <- page_navbar(
     )
   ),
 
-  # ── Tab 6: Report ──────────────────────────────────────────────────────────
+  # -- Tab 6: Report ----------------------------------------------------------
   nav_panel(
     "Report",
     icon = bsicons::bs_icon("file-earmark-text"),
@@ -345,11 +345,11 @@ ui <- page_navbar(
   )
 )
 
-# ── Server ────────────────────────────────────────────────────────────────────
+# -- Server --------------------------------------------------------------------
 
 server <- function(input, output, session) {
 
-  # ── Build model ─────────────────────────────────────────────────────────────
+  # -- Build model -------------------------------------------------------------
   model_rv <- eventReactive(input$run, {
 
     req(input$prevalence, input$new_drug_cost, input$comp1_cost)
@@ -538,16 +538,16 @@ server <- function(input, output, session) {
     model
   })
 
-  # ── Run status ──────────────────────────────────────────────────────────────
+  # -- Run status --------------------------------------------------------------
   output$run_status <- renderUI({
     if (is.null(model_rv())) return(NULL)
     tags$div(
       class = "alert alert-success mb-0",
-      icon("check-circle"), " Model built successfully — navigate to Results."
+      icon("check-circle"), " Model built successfully -- navigate to Results."
     )
   })
 
-  # ── Results tab ─────────────────────────────────────────────────────────────
+  # -- Results tab -------------------------------------------------------------
   output$results_ui <- renderUI({
     req(model_rv())
     m   <- model_rv()
@@ -573,7 +573,7 @@ server <- function(input, output, session) {
                   "#4DAC26"),
         .kpi_card("Cumulative budget impact",
                   .fmt_bi(vc, cur),
-                  sprintf("Years %d–%d", min(yrs), max(yrs)),
+                  sprintf("Years %d-%d", min(yrs), max(yrs)),
                   "#D6604D")
       ),
       br(),
@@ -602,7 +602,7 @@ server <- function(input, output, session) {
     bim_plot_line(m,
                   scenario = m$meta$scenarios,
                   currency_millions = TRUE,
-                  title = paste(input$new_drug_name, "— annual budget impact"))
+                  title = paste(input$new_drug_name, "-- annual budget impact"))
   })
 
   output$plot_cumulative <- renderPlot({
@@ -629,13 +629,13 @@ server <- function(input, output, session) {
     )
   })
 
-  # ── Market shares tab ───────────────────────────────────────────────────────
+  # -- Market shares tab -------------------------------------------------------
   output$plot_shares <- renderPlot({
     req(model_rv())
     bim_plot_shares(model_rv(), title = "Market share evolution")
   })
 
-  # ── DSA ─────────────────────────────────────────────────────────────────────
+  # -- DSA ---------------------------------------------------------------------
   dsa_rv <- eventReactive(input$run_dsa, {
     req(model_rv())
     spec <- bim_sensitivity_spec(
@@ -652,7 +652,7 @@ server <- function(input, output, session) {
     req(dsa_rv())
     bim_plot_tornado(dsa_rv(),
                      currency = isolate(model_rv()$meta$currency),
-                     title    = paste("DSA — Year", input$dsa_year))
+                     title    = paste("DSA -- Year", input$dsa_year))
   })
 
   output$dsa_table_ui <- renderUI({
@@ -673,10 +673,10 @@ server <- function(input, output, session) {
     )
   })
 
-  # ── PSA ─────────────────────────────────────────────────────────────────────
+  # -- PSA ---------------------------------------------------------------------
   psa_rv <- eventReactive(input$run_psa, {
     req(model_rv())
-    showNotification("Running PSA — this may take a moment...",
+    showNotification("Running PSA -- this may take a moment...",
                      duration = NULL, id = "psa_msg", type = "message")
     on.exit(removeNotification("psa_msg"))
     bim_run_psa(
@@ -713,7 +713,7 @@ server <- function(input, output, session) {
     bim_plot_psa(psa_rv(), title = "PSA distribution of budget impact")
   })
 
-  # ── Scenario comparison ──────────────────────────────────────────────────────
+  # -- Scenario comparison ------------------------------------------------------
   output$scenario_table_ui <- renderUI({
     req(model_rv())
     st <- bim_scenario_table(model_rv())
@@ -737,7 +737,7 @@ server <- function(input, output, session) {
     )
   })
 
-  # ── Report ───────────────────────────────────────────────────────────────────
+  # -- Report -------------------------------------------------------------------
   output$report_preview <- renderText({
     req(model_rv())
     paste(bim_report(model_rv()), collapse = "\n")

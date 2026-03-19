@@ -57,6 +57,8 @@ Suggests:
     spelling,
     covr,
     pkgdown
+Config/Needs/website: pkgdown
+Config/Needs/check: testthat
 VignetteBuilder: knitr
 URL: https://github.com/heorlytics/htaBIM,
     https://heorlytics.github.io/htaBIM
