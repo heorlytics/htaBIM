@@ -1,0 +1,10 @@
+pandoc: 3.1.11
+pkgdown: 2.2.0
+pkgdown_sha: ~
+articles:
+  htaBIM-introduction: htaBIM-introduction.html
+  shiny-app: shiny-app.html
+last_built: 2026-03-19T20:16Z
+urls:
+  reference: https://heorlytics.github.io/htaBIM/reference
+  article: https://heorlytics.github.io/htaBIM/articles

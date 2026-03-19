@@ -1,0 +1,164 @@
+# Interactive Shiny Dashboard
+
+## Overview
+
+`htaBIM` ships with a fully interactive Shiny dashboard that lets you
+build, explore, and export a budget impact model entirely through a
+point-and-click interface — no R code required.
+
+The app is built with **bslib** (Bootstrap 5) for a clean, modern layout
+and works in any desktop browser.
+
+------------------------------------------------------------------------
+
+## Launch locally
+
+If you have the package installed, launch the app with one line:
+
+``` r
+htaBIM::launch_shiny()
+```
+
+Required packages are listed in the *Suggests* field of `DESCRIPTION`;
+the app will prompt you if anything is missing.
+
+------------------------------------------------------------------------
+
+## Live demo
+
+> **[Open the live demo →](https://heorlytics.shinyapps.io/htaBIM/)**
+
+*(Deploy your own copy — see the Deployment section below.)*
+
+------------------------------------------------------------------------
+
+## App structure
+
+The dashboard is organised into six tabs:
+
+| Tab               | What it does                                                                                              |
+|-------------------|-----------------------------------------------------------------------------------------------------------|
+| **Model Setup**   | Enter all inputs: population funnel, up to 3 treatments, costs, payer, and uptake dynamics                |
+| **Results**       | KPI cards (Year 1 / final year / cumulative), annual and cumulative line plots, interactive results table |
+| **Market Shares** | Stacked bar chart comparing current vs. new-drug scenario across years                                    |
+| **Sensitivity**   | One-way DSA with tornado diagram + Probabilistic Sensitivity Analysis (Monte Carlo)                       |
+| **Scenarios**     | Side-by-side scenario comparison table and per-patient cost breakdown chart                               |
+| **Report**        | Plain-text and HTML report download                                                                       |
+
+------------------------------------------------------------------------
+
+## Model Setup tab
+
+### Population funnel
+
+| Input                | Description                                                                         |
+|----------------------|-------------------------------------------------------------------------------------|
+| Indication / disease | Free-text label for the condition                                                   |
+| Reference country    | Selects built-in population data (GB, US, CA, DE, FR, IT, AU, JP) or *custom* entry |
+| Prevalence           | Point prevalence as a proportion of the reference population                        |
+| Diagnosed rate       | Proportion of prevalent patients with a diagnosis                                   |
+| Treated rate         | Proportion of diagnosed patients receiving any treatment                            |
+| Eligible rate        | Proportion of treated patients eligible for the new drug                            |
+| Growth rate          | Annual growth in the eligible population                                            |
+| Projection horizon   | Number of years (1–10)                                                              |
+
+### Treatments
+
+Up to **three treatments** are supported:
+
+- **New drug** — name, target market share at end of horizon (%), and
+  uptake dynamics
+- **Comparator 1** — always required; represents the main standard of
+  care
+- **Comparator 2** — optional second comparator (tick the checkbox to
+  enable)
+
+Four uptake dynamics are available: *linear ramp*, *logistic (S-curve)*,
+*step change*, and *constant*.
+
+**Scenario variants** (conservative / optimistic peak shares) are
+defined in this tab and propagate through all analyses.
+
+### Costs & payer
+
+| Input               | Description                                                     |
+|---------------------|-----------------------------------------------------------------|
+| Drug costs          | Annual list price per treatment                                 |
+| Administration cost | Annual infusion / injection cost for new drug                   |
+| Monitoring cost     | Annual monitoring cost for new drug                             |
+| AE cost             | Expected annual adverse event cost for new drug                 |
+| Rebate              | Confidential price discount on new drug (%)                     |
+| Payer perspective   | Generic healthcare system, NHS England, CADTH, or US commercial |
+| Currency            | GBP, USD, EUR, CAD, AUD, JPY                                    |
+| Discount rate       | Applied to Year 2+ costs                                        |
+
+------------------------------------------------------------------------
+
+## Sensitivity tab
+
+### Deterministic sensitivity analysis (DSA)
+
+Set low/high ranges for:
+
+- Prevalence
+- Diagnosed rate
+- Eligible rate
+- New drug cost multiplier
+
+Then click **Run DSA**. A tornado diagram and interactive results table
+are shown for the selected year.
+
+### Probabilistic sensitivity analysis (PSA)
+
+Set standard errors (for epidemiology rates, sampled from Beta
+distributions) and a coefficient of variation (for costs, sampled from
+LogNormal distributions), choose the number of simulations, and click
+**Run PSA**.
+
+A histogram of simulated budget impacts is shown with the base-case
+value and 95 % credible interval marked.
+
+------------------------------------------------------------------------
+
+## Deployment to shinyapps.io
+
+To host your own public copy:
+
+1.  Install `rsconnect`:
+
+    ``` r
+    install.packages("rsconnect")
+    ```
+
+2.  Connect your shinyapps.io account:
+
+    ``` r
+    rsconnect::setAccountInfo(
+      name   = "<your-account>",
+      token  = "<token>",
+      secret = "<secret>"
+    )
+    ```
+
+3.  Deploy the bundled app:
+
+    ``` r
+    rsconnect::deployApp(
+      appDir  = system.file("shiny/htaBIM_app", package = "htaBIM"),
+      appName = "htaBIM"
+    )
+    ```
+
+4.  Copy the resulting URL and add it to your vignette or dossier.
+
+------------------------------------------------------------------------
+
+## Linking from pkgdown
+
+Once the pkgdown site is deployed to GitHub Pages (via the supplied
+GitHub Actions workflow), this vignette renders as an article at:
+
+    https://<org>.github.io/htaBIM/articles/shiny-app.html
+
+You can embed the shinyapps.io link in any article, the `README`, or the
+`_pkgdown.yml` navbar.

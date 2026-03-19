@@ -1,0 +1,290 @@
+# htaBIM ![](reference/figures/logo.png)
+
+### Download stats for CRAN
+
+## Overview
+
+**htaBIM** provides a complete, reproducible framework for **budget
+impact modelling (BIM)** in health technology assessment (HTA),
+following the [ISPOR Task Force
+guidelines](https://doi.org/10.1016/j.jval.2013.08.2291).
+
+It replaces error-prone Excel-based BIM workbooks with structured,
+auditable R workflows that produce submission-quality outputs for NICE,
+CADTH, and EU-HTA dossiers.
+
+### Key features
+
+- 📊 **Epidemiology-driven population estimation** — prevalent,
+  incident, or combined approaches with an eligibility funnel
+- 📈 **Flexible market share modelling** — constant, linear ramp,
+  logistic S-curve, or step uptake dynamics
+- 💊 **Multi-category cost inputs** — drug, administration, monitoring,
+  adverse events, with rebate support
+- 🔄 **Multi-year projections** — annual and cumulative budget impact
+  across scenarios
+- 🏥 **Pre-built payer perspectives** — NHS England, CADTH, US
+  commercial, or custom
+- 📉 **Deterministic sensitivity analysis** — DSA with tornado diagrams
+- 📋 **Submission-ready outputs** — formatted tables, plots, and
+  text/HTML reports
+- 🖥️ **Interactive Shiny dashboard** —
+  [`launch_shiny()`](https://heorlytics.github.io/htaBIM/reference/launch_shiny.md)
+  for stakeholder communication
+
+------------------------------------------------------------------------
+
+## Installation
+
+``` r
+# From CRAN
+install.packages("htaBIM")
+
+# Development version from GitHub
+# install.packages("pak")
+pak::pkg_install("Heorlytics/htaBIM")
+```
+
+------------------------------------------------------------------------
+
+## Quick start
+
+``` r
+library(htaBIM)
+
+# Step 1: Define eligible population
+pop <- bim_population(
+  indication     = "IgA Nephropathy",
+  country        = "custom",
+  years          = 1:5,
+  prevalence     = 0.003,
+  n_total_pop    = 42e6,
+  diagnosed_rate = 0.60,
+  treated_rate   = 0.45,
+  eligible_rate  = 0.30
+)
+
+# Step 2: Define market shares
+ms <- bim_market_share(
+  population     = pop,
+  treatments     = c("Standard of Care", "New Drug"),
+  new_drug       = "New Drug",
+  shares_current = c("Standard of Care" = 1.0, "New Drug" = 0.0),
+  shares_new     = c("Standard of Care" = 0.8, "New Drug" = 0.2),
+  dynamics       = "linear",
+  uptake_params  = list(ramp_years = 3)
+)
+
+# Step 3: Define costs
+costs <- bim_costs(
+  treatments = c("Standard of Care", "New Drug"),
+  currency   = "GBP",
+  drug_costs = c("Standard of Care" = 1500, "New Drug" = 28000)
+)
+
+# Step 4: Assemble and run
+model <- bim_model(pop, ms, costs, payer = bim_payer_nhs())
+summary(model)
+
+# Step 5: Visualise and report
+plot(model, type = "line")
+plot(model, type = "bar")
+bim_report(model)
+```
+
+------------------------------------------------------------------------
+
+## Shiny dashboard
+
+Launch the interactive dashboard for stakeholder presentations:
+
+``` r
+# Requires shiny to be installed
+install.packages("shiny")
+launch_shiny()
+```
+
+------------------------------------------------------------------------
+
+## ISPOR alignment
+
+`htaBIM` implements the methodology described in:
+
+> Sullivan SD, Mauskopf JA, Augustovski F et al. (2014). Budget impact
+> analysis—principles of good practice: report of the ISPOR 2012 Budget
+> Impact Analysis Good Practice II Task Force. *Value in Health*,
+> 17(1):5–14.
+> <doi:%5B10.1016/j.jval.2013.08.2291>\](<https://doi.org/10.1016/j.jval.2013.08.2291>)
+
+> Mauskopf JA, Sullivan SD, Annemans L et al. (2007). Principles of good
+> practice for budget impact analysis. *Value in Health*, 10(5):336–347.
+> <doi:%5B10.1111/j.1524-4733.2007.00187.x>\](<https://doi.org/10.1111/j.1524-4733.2007.00187.x>)
+
+------------------------------------------------------------------------
+
+## Citation
+
+``` r
+citation("htaBIM")
+```
+
+    Pandey S (2026). htaBIM: Budget Impact Modelling for Health Technology
+    Assessment. R package version 0.1.0.
+    https://github.com/Heorlytics/htaBIM
+
+------------------------------------------------------------------------
+
+## Contributing
+
+Contributions, bug reports, and feature requests are welcome via [GitHub
+Issues](https://github.com/Heorlytics/htaBIM/issues).
+
+------------------------------------------------------------------------
+
+## Licence
+
+MIT © 2026 Heorlytics Ltd
+
+# Package index
+
+## Population estimation
+
+Functions to estimate the eligible patient population.
+
+- [`bim_population()`](https://heorlytics.github.io/htaBIM/reference/bim_population.md)
+  : Estimate the annual eligible patient population for a budget impact
+  model
+
+## Market share modelling
+
+Functions to specify treatment market shares and uptake dynamics.
+
+- [`bim_market_share()`](https://heorlytics.github.io/htaBIM/reference/bim_market_share.md)
+  : Specify treatment market shares for a budget impact model
+
+## Cost inputs
+
+Functions to build per-patient cost inputs.
+
+- [`bim_costs()`](https://heorlytics.github.io/htaBIM/reference/bim_costs.md)
+  : Build per-patient annual cost inputs for a budget impact model
+- [`bim_costs_drug()`](https://heorlytics.github.io/htaBIM/reference/bim_costs_drug.md)
+  : Calculate per-patient drug cost from pack size and dosing schedule
+- [`bim_costs_ae()`](https://heorlytics.github.io/htaBIM/reference/bim_costs_ae.md)
+  : Calculate per-patient adverse event costs from AE rates and unit
+  costs
+
+## Model assembly
+
+Assemble and run the budget impact model.
+
+- [`bim_model()`](https://heorlytics.github.io/htaBIM/reference/bim_model.md)
+  : Assemble and run a budget impact model
+
+## Payer perspectives
+
+Define or select payer perspectives.
+
+- [`bim_payer()`](https://heorlytics.github.io/htaBIM/reference/bim_payer.md)
+  : Define a payer perspective for a budget impact model
+- [`bim_payer_default()`](https://heorlytics.github.io/htaBIM/reference/bim_payer_default.md)
+  : Default payer perspective (healthcare system, 100% coverage)
+- [`bim_payer_nhs()`](https://heorlytics.github.io/htaBIM/reference/bim_payer_nhs.md)
+  : NHS England payer perspective
+- [`bim_payer_cadth()`](https://heorlytics.github.io/htaBIM/reference/bim_payer_cadth.md)
+  : CADTH Canadian public payer perspective
+- [`bim_payer_us_commercial()`](https://heorlytics.github.io/htaBIM/reference/bim_payer_us_commercial.md)
+  : US commercial payer perspective
+
+## Sensitivity analysis
+
+Deterministic and probabilistic sensitivity analysis tools.
+
+- [`bim_sensitivity_spec()`](https://heorlytics.github.io/htaBIM/reference/bim_sensitivity_spec.md)
+  : Specify a deterministic sensitivity analysis for a budget impact
+  model
+- [`bim_run_dsa()`](https://heorlytics.github.io/htaBIM/reference/bim_run_dsa.md)
+  : Run a deterministic sensitivity analysis on a budget impact model
+- [`bim_run_psa()`](https://heorlytics.github.io/htaBIM/reference/bim_run_psa.md)
+  : Run a probabilistic sensitivity analysis (PSA)
+
+## Results and outputs
+
+Extract results, tables, plots, and reports.
+
+- [`bim_extract()`](https://heorlytics.github.io/htaBIM/reference/bim_extract.md)
+  : Extract tidy results from a budget impact model
+- [`bim_table()`](https://heorlytics.github.io/htaBIM/reference/bim_table.md)
+  : Generate a formatted budget impact summary table
+- [`bim_scenario_table()`](https://heorlytics.github.io/htaBIM/reference/bim_scenario_table.md)
+  : Cross-scenario budget impact comparison table
+- [`bim_cost_breakdown()`](https://heorlytics.github.io/htaBIM/reference/bim_cost_breakdown.md)
+  : Per-patient cost breakdown by component and treatment
+- [`bim_report()`](https://heorlytics.github.io/htaBIM/reference/bim_report.md)
+  : Generate a budget impact model report
+
+## Plots
+
+Visualisation functions.
+
+- [`plot(`*`<bim_model>`*`)`](https://heorlytics.github.io/htaBIM/reference/plot.bim_model.md)
+  : Plot a budget impact model
+- [`bim_plot_line()`](https://heorlytics.github.io/htaBIM/reference/bim_plot_line.md)
+  : Line plot of annual budget impact over time
+- [`bim_plot_bar()`](https://heorlytics.github.io/htaBIM/reference/bim_plot_bar.md)
+  : Grouped bar chart of annual budget impact by year
+- [`bim_plot_shares()`](https://heorlytics.github.io/htaBIM/reference/bim_plot_shares.md)
+  : Market share stacked bar chart
+- [`bim_plot_tornado()`](https://heorlytics.github.io/htaBIM/reference/bim_plot_tornado.md)
+  : Tornado diagram for DSA results
+- [`bim_plot_psa()`](https://heorlytics.github.io/htaBIM/reference/bim_plot_psa.md)
+  : Plot PSA results
+- [`bim_plot_cost_breakdown()`](https://heorlytics.github.io/htaBIM/reference/bim_plot_cost_breakdown.md)
+  : Plot per-patient cost breakdown as a stacked bar chart
+
+## Interactive app
+
+Shiny dashboard.
+
+- [`launch_shiny()`](https://heorlytics.github.io/htaBIM/reference/launch_shiny.md)
+  : Launch the htaBIM interactive Shiny dashboard
+
+## Print and summary methods
+
+S3 print and summary methods for htaBIM objects.
+
+- [`print(`*`<bim_population>`*`)`](https://heorlytics.github.io/htaBIM/reference/print.bim_population.md)
+  : Print method for bim_population
+- [`print(`*`<bim_market_share>`*`)`](https://heorlytics.github.io/htaBIM/reference/print.bim_market_share.md)
+  : Print method for bim_market_share
+- [`print(`*`<bim_costs>`*`)`](https://heorlytics.github.io/htaBIM/reference/print.bim_costs.md)
+  : Print method for bim_costs
+- [`print(`*`<bim_payer>`*`)`](https://heorlytics.github.io/htaBIM/reference/print.bim_payer.md)
+  : Print method for bim_payer
+- [`print(`*`<bim_model>`*`)`](https://heorlytics.github.io/htaBIM/reference/print.bim_model.md)
+  : Print method for bim_model
+- [`print(`*`<bim_dsa>`*`)`](https://heorlytics.github.io/htaBIM/reference/print.bim_dsa.md)
+  : Print method for bim_dsa
+- [`summary(`*`<bim_population>`*`)`](https://heorlytics.github.io/htaBIM/reference/summary.bim_population.md)
+  : Summary method for bim_population
+- [`summary(`*`<bim_model>`*`)`](https://heorlytics.github.io/htaBIM/reference/summary.bim_model.md)
+  : Summary method for bim_model
+
+## Data
+
+Built-in example datasets.
+
+- [`bim_example`](https://heorlytics.github.io/htaBIM/reference/bim_example.md)
+  : Example budget impact model inputs: Disease X
+
+# Articles
+
+### Getting started
+
+- [Introduction to
+  htaBIM](https://heorlytics.github.io/htaBIM/articles/htaBIM-introduction.md):
+
+### Interactive app
+
+- [Interactive Shiny
+  Dashboard](https://heorlytics.github.io/htaBIM/articles/shiny-app.md):
