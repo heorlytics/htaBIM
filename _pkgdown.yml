@@ -33,6 +33,7 @@ navbar:
     github:
       icon: fa-github
       href: https://github.com/Heorlytics/htaBIM
+      aria-label: GitHub
 
 reference:
   - title: "Population estimation"
@@ -97,6 +98,19 @@ reference:
     desc: Shiny dashboard.
     contents:
       - launch_shiny
+
+  - title: "Print and summary methods"
+    desc: S3 print and summary methods for htaBIM objects.
+    contents:
+      - print.bim_population
+      - print.bim_market_share
+      - print.bim_costs
+      - print.bim_payer
+      - print.bim_model
+      - print.bim_dsa
+      - print.bim_psa
+      - summary.bim_population
+      - summary.bim_model
 
   - title: "Data"
     desc: Built-in example datasets.
