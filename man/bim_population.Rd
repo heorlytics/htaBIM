@@ -16,6 +16,8 @@ bim_population(
   eligible_rate = 1,
   growth_rate = 0,
   approach = c("prevalent", "incident", "both"),
+  extra_filters = list(),
+  eligible_fn = NULL,
   data_source = NULL
 )
 }
@@ -57,6 +59,22 @@ population (e.g. \code{0.005} for 0.5\% per year). Default \code{0.0}.}
 population), \code{"incident"} (new cases per year), or \code{"both"} (sum of
 prevalent and incident). Default \code{"prevalent"}.}
 
+\item{extra_filters}{\code{list} or \code{NULL}. Optional named list of additional
+filtering proportions applied sequentially \strong{after} \code{eligible_rate}.
+Each element must be a single numeric in \verb{[0, 1]}. The names become
+column labels in the output (e.g.
+\code{list(prior_therapy_failure = 0.6, biomarker_positive = 0.4)}).
+Ignored if \code{eligible_fn} is supplied.}
+
+\item{eligible_fn}{\code{function} or \code{NULL}. Optional custom function that
+\strong{replaces} the entire \code{treated_rate * eligible_rate * extra_filters}
+calculation. Must accept three arguments: \code{n_diagnosed} (numeric vector,
+one value per year), \code{n_treated} (numeric vector), and \code{params} (the list
+of all scalar inputs). Must return a numeric vector of the same length.
+Use this when your eligibility logic is not simple sequential
+multiplication (e.g. additive components, minimum/cap rules, lookup
+tables). See the examples below.}
+
 \item{data_source}{\code{character(1)} or \code{NULL}. Citation for the epidemiology
 data, appended to outputs. Optional.}
 }
@@ -64,7 +82,10 @@ data, appended to outputs. Optional.}
 An object of class \code{bim_population}, which is a list containing:
 \describe{
 \item{\code{annual}}{A \code{data.frame} with columns \code{year}, \code{n_total_pop},
-\code{n_prevalent_or_incident}, \code{n_diagnosed}, \code{n_treated}, \code{n_eligible}.}
+\code{n_prevalent_or_incident}, \code{n_diagnosed}, \code{n_treated}, and
+\code{n_eligible}. When \code{extra_filters} are supplied, one additional column
+per filter step is inserted before \code{n_eligible}, showing the
+intermediate patient count at each stage.}
 \item{\code{params}}{A list of all input parameters.}
 \item{\code{meta}}{A list with \code{indication}, \code{country}, \code{approach},
 \code{data_source}.}
@@ -77,6 +98,7 @@ Task Force guidelines (Sullivan et al., 2014). Supports prevalent, incident,
 or combined population approaches.
 }
 \examples{
+# Standard funnel
 pop <- bim_population(
   indication     = "Disease X",
   country        = "GB",
@@ -89,6 +111,36 @@ pop <- bim_population(
 )
 print(pop)
 summary(pop)
+
+# Extra filters: add line-of-therapy and biomarker criteria after eligible_rate
+pop2 <- bim_population(
+  indication     = "Disease X",
+  country        = "GB",
+  years          = 1:5,
+  prevalence     = 0.003,
+  n_total_pop    = 42e6,
+  diagnosed_rate = 0.60,
+  treated_rate   = 0.45,
+  eligible_rate  = 0.30,
+  extra_filters  = list(second_line_plus = 0.55, biomarker_positive = 0.40)
+)
+pop2$annual
+
+# Custom formula: eligible = max of two additive subgroups, capped at treated
+pop3 <- bim_population(
+  indication     = "Disease X",
+  country        = "GB",
+  years          = 1:5,
+  prevalence     = 0.003,
+  n_total_pop    = 42e6,
+  diagnosed_rate = 0.60,
+  treated_rate   = 0.45,
+  eligible_fn    = function(n_diagnosed, n_treated, params) {
+    subgroup_a <- n_diagnosed * 0.20
+    subgroup_b <- n_diagnosed * 0.15
+    pmin(subgroup_a + subgroup_b, n_treated)
+  }
+)
 
 }
 \references{
