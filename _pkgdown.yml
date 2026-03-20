@@ -37,9 +37,11 @@ navbar:
 
 reference:
   - title: "Population estimation"
-    desc: Functions to estimate the eligible patient population.
+    desc: Functions to estimate the eligible patient population, visualise the funnel, and export results.
     contents:
       - bim_population
+      - bim_plot_funnel
+      - bim_export_population
 
   - title: "Market share modelling"
     desc: Functions to specify treatment market shares and uptake dynamics.

@@ -51,6 +51,7 @@ Suggests:
     bslib (>= 0.7.0),
     bsicons (>= 0.1.2),
     DT (>= 0.31),
+    openxlsx (>= 4.2.0),
     knitr,
     rmarkdown,
     testthat (>= 3.0.0),
