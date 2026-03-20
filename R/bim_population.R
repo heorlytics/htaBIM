@@ -36,19 +36,37 @@
 #' @param approach `character(1)`. Population approach: `"prevalent"` (stock
 #'   population), `"incident"` (new cases per year), or `"both"` (sum of
 #'   prevalent and incident). Default `"prevalent"`.
+#' @param extra_filters `list` or `NULL`. Optional named list of additional
+#'   filtering proportions applied sequentially **after** `eligible_rate`.
+#'   Each element must be a single numeric in `[0, 1]`. The names become
+#'   column labels in the output (e.g.
+#'   `list(prior_therapy_failure = 0.6, biomarker_positive = 0.4)`).
+#'   Ignored if `eligible_fn` is supplied.
+#' @param eligible_fn `function` or `NULL`. Optional custom function that
+#'   **replaces** the entire `treated_rate * eligible_rate * extra_filters`
+#'   calculation. Must accept three arguments: `n_diagnosed` (numeric vector,
+#'   one value per year), `n_treated` (numeric vector), and `params` (the list
+#'   of all scalar inputs). Must return a numeric vector of the same length.
+#'   Use this when your eligibility logic is not simple sequential
+#'   multiplication (e.g. additive components, minimum/cap rules, lookup
+#'   tables). See the examples below.
 #' @param data_source `character(1)` or `NULL`. Citation for the epidemiology
 #'   data, appended to outputs. Optional.
 #'
 #' @return An object of class `bim_population`, which is a list containing:
 #' \describe{
 #'   \item{`annual`}{A `data.frame` with columns `year`, `n_total_pop`,
-#'     `n_prevalent_or_incident`, `n_diagnosed`, `n_treated`, `n_eligible`.}
+#'     `n_prevalent_or_incident`, `n_diagnosed`, `n_treated`, and
+#'     `n_eligible`. When `extra_filters` are supplied, one additional column
+#'     per filter step is inserted before `n_eligible`, showing the
+#'     intermediate patient count at each stage.}
 #'   \item{`params`}{A list of all input parameters.}
 #'   \item{`meta`}{A list with `indication`, `country`, `approach`,
 #'     `data_source`.}
 #' }
 #'
 #' @examples
+#' # Standard funnel
 #' pop <- bim_population(
 #'   indication     = "Disease X",
 #'   country        = "GB",
@@ -61,6 +79,36 @@
 #' )
 #' print(pop)
 #' summary(pop)
+#'
+#' # Extra filters: add line-of-therapy and biomarker criteria after eligible_rate
+#' pop2 <- bim_population(
+#'   indication     = "Disease X",
+#'   country        = "GB",
+#'   years          = 1:5,
+#'   prevalence     = 0.003,
+#'   n_total_pop    = 42e6,
+#'   diagnosed_rate = 0.60,
+#'   treated_rate   = 0.45,
+#'   eligible_rate  = 0.30,
+#'   extra_filters  = list(second_line_plus = 0.55, biomarker_positive = 0.40)
+#' )
+#' pop2$annual
+#'
+#' # Custom formula: eligible = max of two additive subgroups, capped at treated
+#' pop3 <- bim_population(
+#'   indication     = "Disease X",
+#'   country        = "GB",
+#'   years          = 1:5,
+#'   prevalence     = 0.003,
+#'   n_total_pop    = 42e6,
+#'   diagnosed_rate = 0.60,
+#'   treated_rate   = 0.45,
+#'   eligible_fn    = function(n_diagnosed, n_treated, params) {
+#'     subgroup_a <- n_diagnosed * 0.20
+#'     subgroup_b <- n_diagnosed * 0.15
+#'     pmin(subgroup_a + subgroup_b, n_treated)
+#'   }
+#' )
 #'
 #' @references
 #' Sullivan SD, Mauskopf JA, Augustovski F et al. (2014). Budget impact
@@ -82,6 +130,8 @@ bim_population <- function(
     eligible_rate  = 1.0,
     growth_rate    = 0.0,
     approach       = c("prevalent", "incident", "both"),
+    extra_filters  = list(),
+    eligible_fn    = NULL,
     data_source    = NULL
 ) {
   approach <- match.arg(approach)
@@ -103,6 +153,20 @@ bim_population <- function(
   .validate_rate(eligible_rate,  "eligible_rate")
   if (!is.numeric(growth_rate) || length(growth_rate) != 1L)
     stop("'growth_rate' must be a single numeric value.", call. = FALSE)
+
+  # Validate extra_filters
+  if (!is.null(extra_filters) && length(extra_filters) > 0L) {
+    if (!is.list(extra_filters))
+      stop("'extra_filters' must be a named list.", call. = FALSE)
+    if (is.null(names(extra_filters)) || any(names(extra_filters) == ""))
+      stop("All elements of 'extra_filters' must be named.", call. = FALSE)
+    for (nm in names(extra_filters))
+      .validate_rate(extra_filters[[nm]], paste0("extra_filters$", nm))
+  }
+
+  # Validate eligible_fn
+  if (!is.null(eligible_fn) && !is.function(eligible_fn))
+    stop("'eligible_fn' must be a function or NULL.", call. = FALSE)
 
   if (approach %in% c("prevalent", "both") && is.null(prevalence))
     stop("'prevalence' is required when approach is 'prevalent' or 'both'.",
@@ -139,17 +203,52 @@ bim_population <- function(
 
   diag_vec  <- prev_vec * diagnosed_rate
   treat_vec <- diag_vec * treated_rate
-  elig_vec  <- treat_vec * eligible_rate
+
+  # Eligible calculation: custom function takes priority over sequential rates
+  if (!is.null(eligible_fn)) {
+    scalar_params <- list(
+      prevalence     = prevalence,
+      incidence      = incidence,
+      n_total_pop    = n_total_pop,
+      diagnosed_rate = diagnosed_rate,
+      treated_rate   = treated_rate,
+      eligible_rate  = eligible_rate,
+      growth_rate    = growth_rate,
+      approach       = approach
+    )
+    elig_vec <- eligible_fn(diag_vec, treat_vec, scalar_params)
+    if (!is.numeric(elig_vec) || length(elig_vec) != length(years))
+      stop("'eligible_fn' must return a numeric vector of length equal to 'years'.",
+           call. = FALSE)
+    extra_cols <- list()
+  } else {
+    extra_cols <- list()
+
+    # Apply extra filters to treated population first, then eligible_rate last
+    if (length(extra_filters) > 0L) {
+      current <- treat_vec
+      for (nm in names(extra_filters)) {
+        current                        <- current * extra_filters[[nm]]
+        extra_cols[[paste0("n_", nm)]] <- round(current)
+      }
+      elig_vec <- current * eligible_rate
+    } else {
+      elig_vec <- treat_vec * eligible_rate
+    }
+  }
 
   annual <- data.frame(
-    year                       = years,
-    n_total_pop                = round(pop_vec),
-    n_prevalent_or_incident    = round(prev_vec),
-    n_diagnosed                = round(diag_vec),
-    n_treated                  = round(treat_vec),
-    n_eligible                 = round(elig_vec),
-    stringsAsFactors           = FALSE
+    year                    = years,
+    n_total_pop             = round(pop_vec),
+    n_prevalent_or_incident = round(prev_vec),
+    n_diagnosed             = round(diag_vec),
+    n_treated               = round(treat_vec),
+    stringsAsFactors        = FALSE
   )
+  # Insert extra filter columns before n_eligible
+  for (col_nm in names(extra_cols))
+    annual[[col_nm]] <- extra_cols[[col_nm]]
+  annual[["n_eligible"]] <- round(elig_vec)
 
   params <- list(
     indication     = indication,
@@ -162,7 +261,9 @@ bim_population <- function(
     treated_rate   = treated_rate,
     eligible_rate  = eligible_rate,
     growth_rate    = growth_rate,
-    approach       = approach
+    approach       = approach,
+    extra_filters  = extra_filters,
+    eligible_fn    = eligible_fn
   )
 
   structure(
@@ -253,6 +354,17 @@ summary.bim_population <- function(object, ...) {
               format(r1$n_diagnosed, big.mark = ",")))
   cat(sprintf("  Treated            : %s\n",
               format(r1$n_treated, big.mark = ",")))
+  # Show any extra filter stages
+  extra_cols <- setdiff(names(r1),
+    c("year", "n_total_pop", "n_prevalent_or_incident",
+      "n_diagnosed", "n_treated", "n_eligible"))
+  for (col in extra_cols) {
+    label <- gsub("^n_", "", col)
+    label <- gsub("_", " ", label)
+    cat(sprintf("  %-19s: %s\n",
+                paste0("  ", label),
+                format(r1[[col]], big.mark = ",")))
+  }
   cat(sprintf("  Eligible           : %s\n",
               format(r1$n_eligible, big.mark = ",")))
   if (!is.null(object$meta$data_source))
