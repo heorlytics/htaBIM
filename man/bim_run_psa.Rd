@@ -44,6 +44,10 @@ last year in the model.}
 \item{scenario}{\code{character(1)}. Scenario to use. Default \code{"base"}.}
 
 \item{seed}{\code{integer(1)} or \code{NULL}. Random seed for reproducibility.}
+
+\item{x}{A \code{bim_psa} object returned by \code{\link[=bim_run_psa]{bim_run_psa()}}.}
+
+\item{...}{Further arguments (ignored).}
 }
 \value{
 An object of class \code{bim_psa}: a list with elements:
@@ -57,6 +61,10 @@ interval of budget impact.}
 \item{\code{n_sim}}{Number of simulations run.}
 \item{\code{base_bi}}{Base-case budget impact for reference.}
 }
+
+\code{print.bim_psa} invisibly returns \code{x}. Called for its side effect
+of printing a formatted PSA summary (mean, median, SD, 95\% credible
+interval) to the console.
 }
 \description{
 Performs a Monte Carlo PSA by repeatedly sampling uncertain parameters from
@@ -90,10 +98,12 @@ costs <- bim_costs(
   drug_costs = c("Drug C (SoC)" = 500, "Drug A (new)" = 25000)
 )
 model <- bim_model(pop, ms, costs)
+\donttest{
 set.seed(1)
 psa <- bim_run_psa(model, n_sim = 200L, prevalence_se = 0.0005,
                    eligible_rate_se = 0.05, cost_cv = 0.10)
 print(psa)
+}
 
 }
 \seealso{

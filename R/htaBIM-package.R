@@ -32,4 +32,6 @@
 #' \doi{10.1111/j.1524-4733.2007.00187.x}
 #'
 #' @keywords internal
+#' @importFrom grDevices colorRampPalette
+#' @importFrom rlang .data
 "_PACKAGE"

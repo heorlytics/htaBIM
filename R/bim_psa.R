@@ -62,10 +62,12 @@
 #'   drug_costs = c("Drug C (SoC)" = 500, "Drug A (new)" = 25000)
 #' )
 #' model <- bim_model(pop, ms, costs)
+#' \donttest{
 #' set.seed(1)
 #' psa <- bim_run_psa(model, n_sim = 200L, prevalence_se = 0.0005,
 #'                    eligible_rate_se = 0.05, cost_cv = 0.10)
 #' print(psa)
+#' }
 #'
 #' @seealso [bim_plot_psa()], [bim_run_dsa()]
 #' @export
@@ -238,6 +240,11 @@ bim_run_psa <- function(
 }
 
 #' @rdname bim_run_psa
+#' @param x A `bim_psa` object returned by [bim_run_psa()].
+#' @param ... Further arguments (ignored).
+#' @return `print.bim_psa` invisibly returns `x`. Called for its side effect
+#'   of printing a formatted PSA summary (mean, median, SD, 95% credible
+#'   interval) to the console.
 #' @export
 print.bim_psa <- function(x, ...) {
   cat("htaBIM Probabilistic Sensitivity Analysis\n")

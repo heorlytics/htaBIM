@@ -39,9 +39,8 @@ app will prompt you if anything is missing.
 
 ## Live demo
 
-> **[Open the live demo →](https://heorlytics.shinyapps.io/htaBIM/)**
-
-*(Deploy your own copy — see the Deployment section below.)*
+Deploy your own copy to shinyapps.io (see the Deployment section below) or
+run the app locally with `htaBIM::launch_shiny()`.
 
 ---
 

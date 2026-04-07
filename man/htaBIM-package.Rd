@@ -43,7 +43,7 @@ practice for budget impact analysis. \emph{Value Health}, 10(5):336-347.
 Useful links:
 \itemize{
   \item \url{https://github.com/heorlytics/htaBIM}
-  \item \url{https://heorlytics.github.io/htaBIM}
+  \item \url{https://heorlytics.github.io/htaBIM/}
   \item Report bugs at \url{https://github.com/heorlytics/htaBIM/issues}
 }
 
