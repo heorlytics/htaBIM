@@ -282,6 +282,8 @@ bim_costs_ae <- function(treatment, ae_table) {
 #' Print method for bim_costs
 #' @param x A `bim_costs` object.
 #' @param ... Further arguments (ignored).
+#' @return Invisibly returns \code{x}. Called for its side effect of printing a
+#'   formatted summary of the cost inputs to the console.
 #' @export
 print.bim_costs <- function(x, ...) {
   cat("\n-- htaBIM Costs --\n\n")

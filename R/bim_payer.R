@@ -122,6 +122,8 @@ bim_payer_us_commercial <- function() {
 #' Print method for bim_payer
 #' @param x A `bim_payer` object.
 #' @param ... Further arguments (ignored).
+#' @return Invisibly returns \code{x}. Called for its side effect of printing a
+#'   formatted summary of the payer perspective settings to the console.
 #' @export
 print.bim_payer <- function(x, ...) {
   cat("\n-- htaBIM Payer Perspective --\n\n")

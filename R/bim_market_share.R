@@ -236,6 +236,8 @@ bim_market_share <- function(
 #' Print method for bim_market_share
 #' @param x A `bim_market_share` object.
 #' @param ... Further arguments (ignored).
+#' @return Invisibly returns \code{x}. Called for its side effect of printing a
+#'   formatted summary of the market share inputs to the console.
 #' @export
 print.bim_market_share <- function(x, ...) {
   cat("\n-- htaBIM Market Share --\n\n")

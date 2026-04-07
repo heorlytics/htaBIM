@@ -318,6 +318,8 @@ bim_population <- function(
 #' Print method for bim_population
 #' @param x A `bim_population` object.
 #' @param ... Further arguments (ignored).
+#' @return Invisibly returns \code{x}. Called for its side effect of printing a
+#'   formatted summary of the patient population inputs to the console.
 #' @export
 print.bim_population <- function(x, ...) {
   cat("\n-- htaBIM Population --\n\n")

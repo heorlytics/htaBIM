@@ -249,6 +249,9 @@ bim_run_dsa <- function(model, sensitivity, year = NULL, scenario = "base") {
 #' Print method for bim_dsa
 #' @param x A `bim_dsa` object.
 #' @param ... Further arguments (ignored).
+#' @return Invisibly returns \code{x}. Called for its side effect of printing a
+#'   formatted summary of the deterministic sensitivity analysis results to the
+#'   console.
 #' @export
 print.bim_dsa <- function(x, ...) {
   cat("\n-- htaBIM DSA Results --\n\n")

@@ -204,6 +204,8 @@ bim_model <- function(
 #' Print method for bim_model
 #' @param x A `bim_model` object.
 #' @param ... Further arguments (ignored).
+#' @return Invisibly returns \code{x}. Called for its side effect of printing a
+#'   formatted summary of the budget impact model results to the console.
 #' @export
 print.bim_model <- function(x, ...) {
   cat("\n-- htaBIM Model --\n\n")

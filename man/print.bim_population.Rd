@@ -11,6 +11,10 @@
 
 \item{...}{Further arguments (ignored).}
 }
+\value{
+Invisibly returns \code{x}. Called for its side effect of printing a
+formatted summary of the patient population inputs to the console.
+}
 \description{
 Print method for bim_population
 }

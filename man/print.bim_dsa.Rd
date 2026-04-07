@@ -11,6 +11,11 @@
 
 \item{...}{Further arguments (ignored).}
 }
+\value{
+Invisibly returns \code{x}. Called for its side effect of printing a
+formatted summary of the deterministic sensitivity analysis results to the
+console.
+}
 \description{
 Print method for bim_dsa
 }
