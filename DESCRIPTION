@@ -21,7 +21,7 @@ Description: Implements a structured, reproducible framework for budget impact
     Produces submission-quality outputs including ISPOR-aligned summary tables,
     scenario comparison tables, per-patient cost breakdowns, tornado diagrams,
     PSA histograms, and text and HTML reports compatible with NICE, CADTH, and
-    EU-HTA dossier formats. Ships with an interactive Shiny dashboard built on
+    EU-HTA dossier formats. Ships with an interactive 'shiny' dashboard built on
     'bslib' for point-and-click model building and exploration.
 License: MIT + file LICENSE
 Encoding: UTF-8

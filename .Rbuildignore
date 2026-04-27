@@ -1,5 +1,6 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^\.claude$
 ^data-raw$
 ^\.github$
 ^README\.Rmd$
@@ -12,3 +13,5 @@
 ^revdep$
 ^\.pre-commit-config\.yaml$
 ^codecov\.yml$
+^CRAN-SUBMISSION$
+^inst/shinylive$

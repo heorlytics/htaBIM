@@ -342,7 +342,7 @@ bim_plot_funnel <- function(pop,
 #' @return The file path `file`, invisibly. A message is printed on success.
 #'
 #' @examples
-#' \dontrun{
+#' \donttest{
 #' pop <- bim_population(
 #'   indication     = "Disease X",
 #'   country        = "GB",
@@ -354,7 +354,7 @@ bim_plot_funnel <- function(pop,
 #'   eligible_rate  = 0.30,
 #'   extra_filters  = list(second_line_plus = 0.55, biomarker_positive = 0.40)
 #' )
-#' bim_export_population(pop, file = "population_funnel.xlsx")
+#' bim_export_population(pop, file = file.path(tempdir(), "population_funnel.xlsx"))
 #' }
 #'
 #' @seealso [bim_population()], [bim_plot_funnel()]

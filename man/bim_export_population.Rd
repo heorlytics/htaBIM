@@ -40,7 +40,7 @@ each stage and percentage of total population (highlighted Eligible row).
 Requires the \strong{openxlsx} package.
 }
 \examples{
-\dontrun{
+\donttest{
 pop <- bim_population(
   indication     = "Disease X",
   country        = "GB",
@@ -52,7 +52,7 @@ pop <- bim_population(
   eligible_rate  = 0.30,
   extra_filters  = list(second_line_plus = 0.55, biomarker_positive = 0.40)
 )
-bim_export_population(pop, file = "population_funnel.xlsx")
+bim_export_population(pop, file = file.path(tempdir(), "population_funnel.xlsx"))
 }
 
 }
